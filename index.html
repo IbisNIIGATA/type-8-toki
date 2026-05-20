@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学習タイプ診断 — あなたの「勉強スタイル」を発見しよう</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F4EF;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE6;
+    --text-primary: #1C1915;
+    --text-secondary: #6B6560;
+    --text-hint: #A09890;
+    --accent: #2B5BE8;
+    --accent-light: #EBF0FD;
+    --accent-dark: #1A3DB5;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.15);
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 22px;
+    --radius-xl: 30px;
+    --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+    --font-display: 'Zen Maru Gothic', 'Noto Sans JP', sans-serif;
+    --font-body: 'Noto Sans JP', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ======= LAYOUT ======= */
+  .app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 16px 80px;
+  }
+
+  .screen {
+    display: none;
+    width: 100%;
+    max-width: 540px;
+    animation: fadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .screen.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ======= TOP SCREEN ======= */
+  .top-hero {
+    text-align: center;
+    padding: 56px 0 32px;
+  }
+
+  .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+    text-transform: uppercase;
+  }
+
+  .hero-emoji {
+    font-size: 72px;
+    line-height: 1;
+    margin-bottom: 20px;
+    display: block;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.12));
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.3;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+  .hero-title span { color: var(--accent); }
+
+  .hero-sub {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+
+  .info-strip {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 36px;
+  }
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .info-icon { font-size: 22px; }
+  .info-label { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+  .info-value { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+
+  .btn-start {
+    display: block;
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    padding: 18px 24px;
+    border: none;
+    border-radius: var(--radius-xl);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    box-shadow: 0 4px 20px rgba(43,91,232,0.35);
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+    margin-bottom: 16px;
+  }
+  .btn-start:hover {
+    background: var(--accent-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(43,91,232,0.4);
+  }
+  .btn-start:active { transform: translateY(0); }
+
+  .start-note {
+    font-size: 12px;
+    color: var(--text-hint);
+    text-align: center;
+  }
+
+  /* ======= QUIZ SCREEN ======= */
+  .quiz-header {
+    padding: 28px 0 20px;
+    text-align: center;
+  }
+
+  .quiz-category {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    margin-bottom: 8px;
+  }
+  .progress-bar-bg {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 100px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent) 0%, #5B8BF5 100%);
+    border-radius: 100px;
+    transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .progress-text {
+    font-size: 12px;
+    color: var(--text-hint);
+    text-align: right;
+  }
+
+  /* Question card */
+  .question-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 28px 24px 24px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 20px;
+    border: 0.5px solid var(--border);
+  }
+
+  .q-number {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-hint);
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  .q-text {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.55;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  /* Answer buttons */
+  .answer-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .answer-btn {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: border-color 0.15s, background 0.15s, transform 0.12s, box-shadow 0.15s;
+    font-family: var(--font-body);
+  }
+  .answer-btn:hover {
+    border-color: var(--accent);
+    background: var(--accent-light);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+  .answer-btn:active { transform: scale(0.99); }
+
+  .answer-btn.selected {
+    border-color: var(--accent);
+    background: var(--accent-light);
+    box-shadow: 0 0 0 3px rgba(43,91,232,0.15);
+  }
+
+  .answer-bullet {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .answer-btn.selected .answer-bullet {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .answer-label {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.4;
+  }
+  .answer-sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+
+  /* Nav buttons */
+  .quiz-nav {
+    display: flex;
+    gap: 10px;
+  }
+  .btn-back {
+    flex: 0 0 auto;
+    width: 52px;
+    height: 52px;
+    background: var(--surface);
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn-back:hover { background: var(--surface2); border-color: var(--text-secondary); }
+  .btn-back:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .btn-next {
+    flex: 1;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    height: 52px;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.15s, transform 0.12s, box-shadow 0.15s, opacity 0.15s;
+    box-shadow: 0 3px 12px rgba(43,91,232,0.3);
+  }
+  .btn-next:hover:not(:disabled) {
+    background: var(--accent-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 18px rgba(43,91,232,0.38);
+  }
+  .btn-next:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; transform: none; }
+
+  /* ======= LOADING SCREEN ======= */
+  #screen-loading {
+    text-align: center;
+    padding: 100px 0;
+  }
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: bounce 1.2s ease-in-out infinite;
+  }
+  .dot:nth-child(1) { animation-delay: 0s; }
+  .dot:nth-child(2) { animation-delay: 0.2s; background: #7BA4F5; }
+  .dot:nth-child(3) { animation-delay: 0.4s; background: #A8C0F8; }
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+    40% { transform: scale(1.2); opacity: 1; }
+  }
+  .loading-text {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+  .loading-sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  /* ======= RESULT SCREEN ======= */
+  .result-header {
+    padding: 36px 0 24px;
+    text-align: center;
+  }
+
+  .result-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 4px 14px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  .result-type-icon {
+    font-size: 80px;
+    line-height: 1;
+    display: block;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 6px 16px rgba(0,0,0,0.14));
+    animation: popIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+    to   { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+
+  .result-type-name {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+
+  .result-type-en {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-hint);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .result-tags {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+  .result-tag {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 100px;
+    border: 1px solid;
+  }
+
+  /* Score bars */
+  .axis-scores {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 22px 20px;
+    margin-bottom: 16px;
+    border: 0.5px solid var(--border);
+    box-shadow: var(--shadow-sm);
+  }
+  .axis-score-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .axis-bar-row {
+    margin-bottom: 16px;
+  }
+  .axis-bar-row:last-child { margin-bottom: 0; }
+  .axis-bar-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .axis-bar-label-l { color: var(--text-secondary); }
+  .axis-bar-label-r { color: var(--text-secondary); }
+  .axis-bar-bg {
+    height: 10px;
+    background: var(--surface2);
+    border-radius: 100px;
+    overflow: hidden;
+    position: relative;
+  }
+  .axis-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .axis-bar-marker {
+    font-size: 11px;
+    color: var(--text-hint);
+    margin-top: 4px;
+    text-align: center;
+  }
+
+  /* Result description */
+  .result-desc-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 24px 20px;
+    margin-bottom: 16px;
+    border: 0.5px solid var(--border);
+    box-shadow: var(--shadow-sm);
+  }
+  .result-desc-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--text-hint);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .result-desc-text {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text-primary);
+  }
+  .result-strength-list {
+    list-style: none;
+    margin-top: 16px;
+  }
+  .result-strength-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    padding: 8px 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .result-strength-list li:last-child { border-bottom: none; }
+  .strength-dot {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    margin-top: 1px;
+  }
+
+  /* Tips */
+  .tips-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 24px 20px;
+    margin-bottom: 16px;
+    border: 0.5px solid var(--border);
+    box-shadow: var(--shadow-sm);
+  }
+  .tips-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .tips-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    background: var(--accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .tips-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .tip-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 0.5px solid var(--border);
+    align-items: flex-start;
+  }
+  .tip-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .tip-num {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .tip-content {}
+  .tip-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+  .tip-body { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* Catch text */
+  .result-catch-text {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.5;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  /* NG card */
+  .ng-card {
+    background: #FFF8F6;
+    border: 1px solid #F5C4B3;
+    border-radius: var(--radius-lg);
+    padding: 20px 20px;
+    margin-bottom: 16px;
+  }
+  .ng-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .ng-icon-wrap { font-size: 20px; }
+  .ng-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: #993C1D; }
+  .ng-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid #F5C4B3; align-items: flex-start; }
+  .ng-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .ng-x { width: 22px; height: 22px; min-width: 22px; border-radius: 50%; background: #F5C4B3; color: #993C1D; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+  .ng-label { font-size: 13px; font-weight: 700; color: #993C1D; margin-bottom: 2px; }
+  .ng-body { font-size: 12px; color: #7A4030; line-height: 1.6; }
+  /* Subject card */
+  .subject-card { background: var(--surface); border-radius: var(--radius-lg); padding: 24px 20px; margin-bottom: 16px; border: 0.5px solid var(--border); box-shadow: var(--shadow-sm); }
+  .subject-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .subject-icon-wrap { width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .subject-title { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--text-primary); }
+  .subject-item { padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+  .subject-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .subject-name { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 5px; }
+  .subject-emoji { font-size: 16px; }
+  .subject-advice { font-size: 13px; color: var(--text-primary); line-height: 1.7; }
+  .subject-tip-tag { display: inline-block; font-size: 11px; font-weight: 700; background: var(--accent-light); color: var(--accent); padding: 2px 8px; border-radius: 100px; margin-bottom: 5px; }
+  /* Caution card */
+  .caution-card {
+    background: #FFFBEB;
+    border: 1px solid #F5CC6B;
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .caution-icon { font-size: 18px; flex-shrink: 0; }
+  .caution-text { font-size: 13px; color: #7A5700; line-height: 1.6; }
+
+  /* CTA */
+  .cta-card {
+    background: var(--accent);
+    border-radius: var(--radius-lg);
+    padding: 24px 20px;
+    text-align: center;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 24px rgba(43,91,232,0.3);
+  }
+  .cta-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .cta-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .btn-cta {
+    display: block;
+    width: 100%;
+    background: #fff;
+    color: var(--accent);
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px 20px;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: transform 0.12s, box-shadow 0.12s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  }
+  .btn-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.18); }
+
+  .btn-retry {
+    display: block;
+    width: 100%;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 14px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    margin-top: 12px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .btn-retry:hover { background: var(--surface2); color: var(--text-primary); }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .hero-title { font-size: 24px; }
+    .result-type-name { font-size: 28px; }
+    .q-text { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== TOP SCREEN ===== -->
+  <div id="screen-top" class="screen active">
+    <div class="top-hero">
+      <div class="logo-badge">✦ Study Type Check</div>
+      <span class="hero-emoji">🧠</span>
+      <h1 class="hero-title">あなたの<span>学習タイプ</span>を<br>発見しよう！</h1>
+      <p class="hero-sub">12の質問に答えるだけで、<br>あなたにぴったりの「勉強スタイル」がわかります。</p>
+      <div class="info-strip">
+        <div class="info-item">
+          <div class="info-icon">⏱</div>
+          <div class="info-label">所要時間</div>
+          <div class="info-value">約1〜2分</div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon">📝</div>
+          <div class="info-label">質問数</div>
+          <div class="info-value">12問</div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon">🎯</div>
+          <div class="info-label">タイプ数</div>
+          <div class="info-value">全8種類</div>
+        </div>
+      </div>
+      <button class="btn-start" onclick="startQuiz()">診断スタート →</button>
+      <p class="start-note">登録不要・無料で利用できます</p>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ SCREEN ===== -->
+  <div id="screen-quiz" class="screen">
+    <div class="quiz-header">
+      <div id="quiz-category" class="quiz-category"></div>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg">
+          <div id="progress-fill" class="progress-bar-fill" style="width:0%"></div>
+        </div>
+        <div id="progress-text" class="progress-text">1 / 12</div>
+      </div>
+    </div>
+
+    <div class="question-card">
+      <div id="q-number" class="q-number"></div>
+      <div id="q-text" class="q-text"></div>
+    </div>
+
+    <div id="answer-grid" class="answer-grid"></div>
+
+    <div class="quiz-nav" style="margin-top:20px;">
+      <button id="btn-back" class="btn-back" onclick="goBack()" disabled>←</button>
+      <button id="btn-next" class="btn-next" onclick="goNext()" disabled>次の問題へ →</button>
+    </div>
+  </div>
+
+  <!-- ===== LOADING SCREEN ===== -->
+  <div id="screen-loading" class="screen">
+    <div class="loading-spinner">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <div class="loading-text">あなたのタイプを診断中…</div>
+    <div class="loading-sub">12問の回答から「学習スタイル」を分析しています</div>
+  </div>
+
+  <!-- ===== RESULT SCREEN ===== -->
+  <div id="screen-result" class="screen">
+    <div class="result-header">
+      <div class="result-label">診断結果</div>
+      <span id="result-icon" class="result-type-icon"></span>
+      <div id="result-name" class="result-type-name"></div>
+      <div id="result-en" class="result-type-en"></div>
+      <div id="result-tags" class="result-tags"></div>
+    </div>
+
+    <!-- Axis scores -->
+    <div class="axis-scores">
+      <div class="axis-score-title">あなたの傾向スコア</div>
+      <div class="axis-bar-row">
+        <div class="axis-bar-labels">
+          <span class="axis-bar-label-l">👁 見て覚える</span>
+          <span class="axis-bar-label-r">✍ 書いて覚える</span>
+        </div>
+        <div class="axis-bar-bg">
+          <div id="bar-axis1" class="axis-bar-fill" style="width:50%; background: linear-gradient(90deg,#2B5BE8,#5B8BF5);"></div>
+        </div>
+        <div id="bar-axis1-label" class="axis-bar-marker"></div>
+      </div>
+      <div class="axis-bar-row">
+        <div class="axis-bar-labels">
+          <span class="axis-bar-label-l">🎯 目標・結果重視</span>
+          <span class="axis-bar-label-r">💡 興味・好奇心重視</span>
+        </div>
+        <div class="axis-bar-bg">
+          <div id="bar-axis2" class="axis-bar-fill" style="width:50%; background: linear-gradient(90deg,#0F9E75,#5DCAA5);"></div>
+        </div>
+        <div id="bar-axis2-label" class="axis-bar-marker"></div>
+      </div>
+      <div class="axis-bar-row">
+        <div class="axis-bar-labels">
+          <span class="axis-bar-label-l">📅 計画コツコツ</span>
+          <span class="axis-bar-label-r">⚡ 直前集中</span>
+        </div>
+        <div class="axis-bar-bg">
+          <div id="bar-axis3" class="axis-bar-fill" style="width:50%; background: linear-gradient(90deg,#D85A30,#F0997B);"></div>
+        </div>
+        <div id="bar-axis3-label" class="axis-bar-marker"></div>
+      </div>
+    </div>
+
+    <!-- Description & キャッチコピー -->
+    <div class="result-desc-card">
+      <div class="result-desc-label">あなたはこんな人</div>
+      <div id="result-catch" class="result-catch-text"></div>
+      <div id="result-desc" class="result-desc-text"></div>
+    </div>
+
+    <!-- 強み -->
+    <div class="result-desc-card">
+      <div class="result-desc-label">✨ あなたの学習における強み</div>
+      <ul id="result-strengths" class="result-strength-list"></ul>
+    </div>
+
+    <!-- NG行動 -->
+    <div class="ng-card">
+      <div class="ng-header">
+        <div class="ng-icon-wrap">⚠️</div>
+        <div class="ng-title">やりがちなNG行動・落とし穴</div>
+      </div>
+      <div id="result-ng"></div>
+    </div>
+
+    <!-- Tips -->
+    <div class="tips-card">
+      <div class="tips-header">
+        <div class="tips-icon-wrap">💡</div>
+        <div class="tips-title">あなたにおすすめの勉強法 5選</div>
+      </div>
+      <div id="result-tips"></div>
+    </div>
+
+    <!-- 教科別アドバイス -->
+    <div class="subject-card">
+      <div class="subject-header">
+        <div class="subject-icon-wrap">📐</div>
+        <div class="subject-title">教科別 攻略アドバイス</div>
+      </div>
+      <div id="result-subjects"></div>
+    </div>
+
+    <!-- Caution -->
+    <div class="caution-card">
+      <div class="caution-icon">📌</div>
+      <div class="caution-text">この診断はあなたの「得意なスタイル」を見つけるためのものです。タイプはあくまで参考のひとつ。合わないと感じたら別の方法も試してみましょう！</div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-card">
+      <div class="cta-title">もっと詳しく知りたい方へ</div>
+      <div class="cta-sub">あなたのタイプに合った<br>具体的な学習プランを一緒に考えます。</div>
+      <button class="btn-cta">無料相談・体験授業を申し込む →</button>
+    </div>
+
+    <button class="btn-retry" onclick="retryQuiz()">もう一度診断する</button>
+  </div>
+
+</div>
+
+<script>
+// ===================================================
+// DATA
+// ===================================================
+const QUESTIONS = [
+  // Axis 1: INPUT (visual = A, kinesthetic = B)
+  {
+    axis: 1,
+    direction: 'A',
+    category: "軸① どうやって覚える？",
+    text: "授業のノートを見返すとき、文字よりも図や色ペンで書いた部分の方が頭に入りやすい",
+  },
+  {
+    axis: 1,
+    direction: 'B',
+    category: "軸① どうやって覚える？",
+    text: "新しいことを覚えるとき、実際に手を動かして書いてみないと落ち着かない",
+  },
+  {
+    axis: 1,
+    direction: 'A',
+    category: "軸① どうやって覚える？",
+    text: "地図や図表を見ると、説明文より早く内容が理解できる",
+  },
+  {
+    axis: 1,
+    direction: 'B',
+    category: "軸① どうやって覚える？",
+    text: "覚えたいことがあったら、何度も書いて練習するのが自分のスタイルだ",
+  },
+  // Axis 2: MOTIVATION (goal = A, interest = B)
+  {
+    axis: 2,
+    direction: 'A',
+    category: "軸② なぜ勉強する？",
+    text: "テストで高い点数を取る・志望校に合格するといった、はっきりしたゴールがあると頑張れる",
+  },
+  {
+    axis: 2,
+    direction: 'B',
+    category: "軸② なぜ勉強する？",
+    text: "好きな教科や得意分野なら、点数に関係なく深く調べたくなる",
+  },
+  {
+    axis: 2,
+    direction: 'A',
+    category: "軸② なぜ勉強する？",
+    text: "順位や成績が上がった・目標を達成したとき、いちばん勉強のやりがいを感じる",
+  },
+  {
+    axis: 2,
+    direction: 'B',
+    category: "軸② なぜ勉強する？",
+    text: "「なぜそうなるの？」という疑問が頭に浮かんで、つい調べてしまうことがある",
+  },
+  // Axis 3: EXECUTION (planner = A, sprinter = B)
+  {
+    axis: 3,
+    direction: 'A',
+    category: "軸③ いつ・どう動く？",
+    text: "定期テストの2週間前には勉強計画を立てて、少しずつ進められる",
+  },
+  {
+    axis: 3,
+    direction: 'B',
+    category: "軸③ いつ・どう動く？",
+    text: "テスト前日や数日前の方が、普段より集中できて結果も出やすい",
+  },
+  {
+    axis: 3,
+    direction: 'A',
+    category: "軸③ いつ・どう動く？",
+    text: "やることリストやスケジュール帳を使って、勉強の進み具合を確認するのが好きだ",
+  },
+  {
+    axis: 3,
+    direction: 'B',
+    category: "軸③ いつ・どう動く？",
+    text: "気分が乗ってきたタイミングに一気に集中するのが、自分の勉強スタイルに合っている",
+  },
+];
+
+// Score key: each answer = +1 to axis direction score
+// axis1: visual(A) vs kinesthetic(B)
+// axis2: goal(A) vs interest(B)
+// axis3: planner(A) vs sprinter(B)
+
+const TYPES = {
+
+  // =========================================================
+  // AAA : マップ探検家（視覚×目標×計画）
+  // =========================================================
+  'AAA': {
+    name: 'マップ探検家',
+    en: 'MAP EXPLORER',
+    icon: '🗺',
+    tags: [
+      { label: '視覚優位', color: '#EBF0FD', textColor: '#1A3DB5' },
+      { label: '目標型', color: '#E1F5EE', textColor: '#085041' },
+      { label: 'コツコツ計画型', color: '#FAEEDA', textColor: '#633806' },
+    ],
+    catch: '「全体地図を描いてから進む」—— 最も安定して成績を伸ばせるタイプ',
+    desc: 'あなたは「見て理解する×目標達成×計画的に積み上げる」という、学習の王道を歩めるタイプです。テスト範囲が配られたとき、まず全体を眺めて「どこが重要か」を整理してから取り組みたくなる——そんな感覚はありませんか？ 図・矢印・色で知識を地図のように整理することで、ほかの人より早く「つながり」を見つけられる力があります。計画を立てることも苦にならず、目標が決まれば迷わず進めます。この3つの力が組み合わさると、定期テストで着実に結果を出し続けられます。',
+    strengths: [
+      { text: '図・グラフ・教科書のまとめページを見ると、文章を読む前から内容の全体像がつかめる。ノートを色分けしたり矢印でつないだりすることで記憶が強固になる。', icon: '👁' },
+      { text: '「今週はここまで終わらせる」という計画を立てると、迷わず動き出せる。目標達成チェックリストを埋めていく達成感がモチベーションを維持させる。', icon: '📅' },
+      { text: '知識どうしの「つながり」を見つけるのが得意。例えば理科の気象と地理の地形を結びつけたり、歴史の流れを年表で視覚化したりすることが自然にできる。', icon: '🔗' },
+    ],
+    ng: [
+      { label: '計画を「作ること」が目的になってしまう', body: '丁寧な計画表を作るのに時間をかけすぎて、実際に手を動かす時間が減る。計画は15分以内に作り、あとは実行に集中しよう。' },
+      { label: '全体像を整理しすぎて「細かい暗記」が後回しになる', body: '大きな流れをつかむのは得意でも、細かい語句・公式の暗記を後回しにしがち。全体→細部のバランスを意識して。' },
+      { label: '「完璧なノート」を作ることに集中しすぎる', body: 'きれいにまとめることより、問題を解くアウトプットの時間が成績を伸ばす。ノートは「解くために見るもの」と割り切ろう。' },
+    ],
+    tips: [
+      { title: '単元の冒頭で「1枚マップ」を描く', body: '新しい単元を始めるとき、まず教科書のタイトル・見出しだけを見て、A4の紙1枚に全体の流れを矢印と枠で書いてみよう。内容を読む前に「地図」を作るだけで理解スピードが2倍になる。学習が進むにつれてその地図に情報を書き足していくと、最強の復習シートが完成する。' },
+      { title: 'カラー付箋を使った「視覚的計画表」を作る', body: '教科ごとに色を決めた付箋（例：数学＝青、英語＝黄）をカレンダーに貼るだけで、「何日に何をやるか」が一目でわかる計画表になる。付箋を剥がす達成感が、継続のエネルギーになる。スマホのカレンダーアプリに同じ色分けで入力しても◎。' },
+      { title: '「問題を解く→地図に書き足す」のループを作る', body: '問題演習で間違えたポイントを、さっき作った1枚マップに書き加えていこう。地図が育つほど知識が定着し、テスト前の見直しが「地図を眺めるだけ」で済むようになる。間違えた場所が目で見えるので、どこを重点的に復習すべきかも一目瞭然。' },
+      { title: '「目標点数→逆算計画」で動く', body: 'テストで取りたい点数を決めたら、「そのためにどの問題を確実に取るか」を逆算しよう。例えば「80点を取る＝基本問題を全部取る＋応用問題3問」と決めると、何をやればいいかが明確になる。漠然と「頑張る」より、ゴールを数字で決めると断然動きやすい。' },
+      { title: '寝る前5分の「復習スライドショー」', body: '今日学んだことをノートや教科書を見ながら、目を閉じて頭の中で「映像として思い浮かべる」練習をしよう。視覚タイプのあなたには、この「頭の中の映像再生」が特に記憶定着に効果的。寝る直前に復習した内容は、睡眠中に記憶が整理・定着されやすいという研究もある。' },
+    ],
+    subjects: [
+      { emoji: '📐', name: '数学', tag: 'おすすめ：図解ノート法', advice: '公式や解法を「なぜそうなるか」の図と一緒にノートに書いておこう。例えば一次方程式なら天秤のイラスト、三角形の面積なら長方形から切り取るイメージ図を添えると、問題を見たときに図が頭に浮かんで解きやすくなる。問題演習は教科書の例題→類題→入試レベルと段階を踏んで進めよう。' },
+      { emoji: '✏️', name: '国語', tag: 'おすすめ：段落マップ法', advice: '長文読解は段落ごとに「何を言っているか」を2〜3語で書き、矢印でつないだ「文章マップ」を作ると論旨がつかみやすい。漢字・語彙は意味と一緒に「イメージ図」を描くと記憶に残りやすい。作文や記述問題は先に「骨格」を図で描いてから文章化しよう。' },
+      { emoji: '🌍', name: '英語', tag: 'おすすめ：文法の構造図解', advice: '英文法はルールを「木構造」や「ブロック図」で整理すると理解が深まる。例えばSVOCを色分けして図示したり、時制の変化を矢印のタイムラインで描いたりしてみよう。単語は意味・発音・例文をセットで「単語カード（視覚的に見やすいデザイン）」にまとめると定着率が上がる。' },
+    ],
+  },
+
+  // =========================================================
+  // AAB : ラストスパーター（視覚×目標×直前）
+  // =========================================================
+  'AAB': {
+    name: 'ラストスパーター',
+    en: 'LAST SPRINTER',
+    icon: '⚡',
+    tags: [
+      { label: '視覚優位', color: '#EBF0FD', textColor: '#1A3DB5' },
+      { label: '目標型', color: '#E1F5EE', textColor: '#085041' },
+      { label: '直前集中型', color: '#FAECE7', textColor: '#712B13' },
+    ],
+    catch: '「締め切りが見えると、本気スイッチが入る」—— 直前力を武器に変えるタイプ',
+    desc: 'あなたは「見て理解する×目標達成×直前に集中力が爆発する」タイプです。テストが近づくと突然スイッチが入り、驚くほどの集中力でまとめノートや一覧表を仕上げる——そんな経験はありませんか？ これはサボっているのではなく、「ゴールが見えないと本気になれない」という脳の特性です。まとめた表や図を一気に見渡して頭に焼き付ける力は、視覚優位のあなたの強力な武器。ただし「前日だけ」に頼りすぎると得点の波が大きくなるので、直前力を最大化する「仕込み」の工夫が成績安定の鍵になります。',
+    strengths: [
+      { text: '締め切りや目標点数が決まると、短時間で驚くほどの集中力を発揮できる。「あと〇日」というカウントダウンが見えると動き出せる。', icon: '⚡' },
+      { text: '重要ポイントを一覧表・暗記シート・チートシートなどに視覚的にまとめる力が高い。「これだけ見れば全部わかる」シートを作るのが得意。', icon: '📋' },
+      { text: '「目標点数を取る」というゴールが明確なほどやる気が上がる。結果が出たときの達成感が次の頑張りへの燃料になる。', icon: '🎯' },
+    ],
+    ng: [
+      { label: '前日だけの詰め込みで「一夜漬け」を繰り返す', body: '短期記憶には入っても、テスト2週間後には忘れてしまう。高校受験では積み上げが必要になるので、今から「仕込みの習慣」を少しずつ作ろう。' },
+      { label: 'ゴールが見えないと何もしない時期が長くなる', body: 'テスト3週間前は勉強ゼロ、前日だけ徹夜、というパターンはリスクが高い。小さな「締め切り」を自分で作ることが突破口になる。' },
+      { label: '「まとめる」だけで「解く」練習が足りなくなる', body: 'きれいな一覧表を作って満足してしまいがち。まとめた後に必ず問題を解いて「使える知識」に変える工程を忘れずに。' },
+    ],
+    tips: [
+      { title: '「ミニ締め切り」を週1回自分で作る', body: '本番テストを待たなくていい。毎週金曜日に「今週の範囲」だけを10分で自分テストしよう。小さな締め切りを作ることで、週に一度本気スイッチが入る習慣ができる。このサイクルを続けると、本番テスト前には「すでに何度も見た内容」が増えており、直前の詰め込みが格段に楽になる。' },
+      { title: '「前日最強ノート」を毎日少しずつ仕込む', body: 'テスト前日に使う「一夜漬け専用ノート」を、今日から少しずつ作り始めよう。授業ごとに「これだけ覚えれば点が取れる」ポイントを1〜3行書いておくだけでいい。前日にそのノートを見るだけで最速の復習ができる。前日の自分に贈るプレゼントを毎日準備するイメージ。' },
+      { title: '重要語句は「視覚的暗記カード」でストック', body: '単語・公式・年号などは、A6サイズのカードに表（問題）・裏（答え）を書いてストックしよう。電車や休み時間にパラパラめくるだけで復習できる。デジタル派はAnkiなどの暗記アプリも◎。視覚的に整理されたカードは、あなたの記憶に特に残りやすい形式。' },
+      { title: '「目標点数→最低限やること」を逆算する', body: 'テストで80点を取りたいなら「どの問題を確実に取ればいいか」を先に決めよう。例えば「基本問題（60点分）を全部＋応用問題2問（20点分）」と決めると、やることが絞られて動き出せる。ゴールから逆算する思考がこのタイプには特に効果的。' },
+      { title: '直前3日間の「超集中プラン」を作る', body: 'テスト3日前から本番直前までを「スプリント期間」と位置づけ、3日間のやることを1枚の紙に書き出そう。1日目：全範囲の確認、2日目：苦手分野の集中攻略、3日目：暗記事項の最終確認——このパターンで動くと、直前集中力を最大効率で使える。' },
+    ],
+    subjects: [
+      { emoji: '📐', name: '数学', tag: 'おすすめ：公式一覧シート法', advice: '単元ごとに「使う公式・解法パターン」だけを1枚にまとめたシートを作ろう。直前にそのシートを見てから問題を解くと、短時間で高い正答率が出る。計算ミスが多い場合は「見直しチェックリスト」を作って答案用紙に沿って確認する習慣をつけよう。' },
+      { emoji: '✏️', name: '国語', tag: 'おすすめ：頻出漢字・語彙の視覚化', advice: '漢字と語彙は「よく出る順」で一覧表を作って壁に貼ろう。毎日目に入るだけで記憶に入っていく。長文読解は「ポイントを線で引きながら読む」癖をつけると、見落としが減る。記述問題は「何を聞かれているか」を赤ペンで囲んでから答えを書くと、的外れな答えが減る。' },
+      { emoji: '🌍', name: '英語', tag: 'おすすめ：頻出表現の暗記カード', advice: '英単語・熟語は暗記カードで一気に覚えよう。音読しながら書くと記憶に残りやすい。文法はパターン別に例文を1つずつ覚えると応用が利く。直前にそのカードをパラパラめくるだけで、脳がウォームアップされてテストで思い出しやすくなる。' },
+    ],
+  },
+
+  // =========================================================
+  // ABA : コレクター（視覚×興味×計画）
+  // =========================================================
+  'ABA': {
+    name: 'コレクター',
+    en: 'KNOWLEDGE COLLECTOR',
+    icon: '📚',
+    tags: [
+      { label: '視覚優位', color: '#EBF0FD', textColor: '#1A3DB5' },
+      { label: '興味・好奇心型', color: '#E1F5EE', textColor: '#085041' },
+      { label: 'コツコツ計画型', color: '#FAEEDA', textColor: '#633806' },
+    ],
+    catch: '「好きなことは図鑑レベルで語れる」—— 知識を集めて整理することに喜びを感じるタイプ',
+    desc: 'あなたは「見て理解する×知的好奇心×コツコツ計画」という、知識の「コレクター」タイプです。一度興味を持つと、教科書を超えてどこまでも深掘りしてしまう——そんな経験はありませんか？ 好きな分野については図鑑のように詳しく、それを図や表で整理してまとめることも得意です。計画的に学ぶ力もあるので、「今週はこのテーマを完全制覇する」と決めてじっくり取り組むスタイルが最も力を発揮します。興味のある分野から入って、関連する教科へと知識を広げていけると、気がついたら苦手科目まで得意になっていることもあります。',
+    strengths: [
+      { text: '一度興味を持つと教科書の外まで調べてしまうほどの探究力がある。授業で「なぜ？」と思ったことを図書館やインターネットで深掘りすることを楽しめる。', icon: '🔍' },
+      { text: '調べた知識を図・表・イラスト付きで整理する力が高い。「マイ図鑑ノート」を作るようなまとめ方が自然にでき、見返すだけで記憶に残る。', icon: '📊' },
+      { text: '計画的に学べるので長期の学習も安定している。「今週はこの単元を完璧にする」と決めたら、少しずつ着実に進められる。', icon: '📅' },
+    ],
+    ng: [
+      { label: '好きな教科だけ深掘りしすぎてバランスが崩れる', body: '興味のある教科に時間をかけすぎると、苦手科目が置き去りになる。週の勉強時間に「教科ごとの最低時間」を決めておこう。' },
+      { label: '「調べる・まとめる」が多く「解く」練習が少なくなる', body: 'インプット（調べる・読む・まとめる）が充実しても、問題を解くアウトプットが少ないと点数に結びつきにくい。演習の時間を意識的に確保しよう。' },
+      { label: '「完璧に理解してから次へ」と思いすぎる', body: '理解を深めようとする姿勢は素晴らしいが、「完全にわかってから」と思うと進みが遅くなる。「7割わかればOK、解きながら残り3割を埋める」の感覚で進めよう。' },
+    ],
+    tips: [
+      { title: '「マイ図鑑ノート」を教科ごとに作る', body: '教科ごとにテーマ別のノートを1冊ずつ用意して、気になった知識を「1テーマ1見開き」でまとめよう。文章だけでなく図・イラスト・矢印を積極的に使う。教科書には書いていない「深掘り情報」もここに書くと、授業が楽しくなる。定期的に見返すと記憶が定着し、テスト対策にもなる。' },
+      { title: '「好き教科→関連教科」の連鎖学習法', body: '得意・好きな教科から、関連する教科に知識を広げていこう。例えば「地理が好き」なら→歴史（地形と歴史の関係）→理科（気候と地形）→国語（地域の文化を描いた作品）という連鎖が生まれる。教科の垣根を超えた知識のつながりを意識すると、苦手科目への入口が自然にできる。' },
+      { title: '週ごとに「今週のテーマ」を1つ決める', body: '毎週日曜日に「今週は〇〇を完全にマスターする」というテーマを1つ決めよう。例えば「今週は1次方程式の文章題」「今週は明治時代の流れ」など。テーマを絞ることで深掘り力が発揮され、達成感も得られる。週末にテーマごとに問題を解いて確認しよう。' },
+      { title: '「調べる60分：解く60分」のバランスを保つ', body: '1回の勉強時間を「調べる・まとめる時間」と「問題を解く時間」で半々に分けることを意識しよう。まとめた内容をすぐ問題で試すことで、知識が「使える力」に変わる。調べただけで終わっていた内容が、実際に解いてみると意外と書けない——そのギャップを埋めることが大切。' },
+      { title: '「なぜ？」を起点にした深掘り学習', body: '授業中に「なぜこうなるの？」と思ったことをメモしておき、その日の夜に5分だけ調べてみよう。答えがわかったら図鑑ノートに書き込む。この「疑問→解決→記録」のループが、あなたの記憶力を最も活性化させる学習サイクルだ。' },
+    ],
+    subjects: [
+      { emoji: '📐', name: '数学', tag: 'おすすめ：「なぜそうなるか」の理解優先', advice: '公式を丸暗記するのではなく「なぜこの公式が成り立つのか」を図で理解してからノートに書こう。背景がわかると応用問題にも強くなる。計算練習は退屈に感じるかもしれないが、「正確さの速度記録」を自分でとってゲーム感覚にすると続けやすい。' },
+      { emoji: '✏️', name: '国語', tag: 'おすすめ：文章の「地図」を作る', advice: '読書量が多いと長文読解で有利になる。読んだ本の「登場人物・出来事・感情の変化」を図で整理する習慣をつけると、読解力が自然と上がる。漢字や語彙は「この漢字の由来は？」と興味を持ちながら覚えると記憶に残りやすい。' },
+      { emoji: '🌍', name: '英語', tag: 'おすすめ：英語圏の文化から入る', advice: '単語や文法を単体で覚えるより、「英語圏の文化・ニュース・映画」に興味を持つことから入ると吸収力が格段に上がる。好きな洋楽・アニメの英語版で学ぶのもこのタイプには効果的。興味のある内容を英語で調べてみることも力になる。' },
+    ],
+  },
+
+  // =========================================================
+  // ABB : スプリンター（視覚×興味×直前）
+  // =========================================================
+  'ABB': {
+    name: 'スプリンター',
+    en: 'SPRINTER',
+    icon: '🏃',
+    tags: [
+      { label: '視覚優位', color: '#EBF0FD', textColor: '#1A3DB5' },
+      { label: '興味・好奇心型', color: '#E1F5EE', textColor: '#085041' },
+      { label: '直前集中型', color: '#FAECE7', textColor: '#712B13' },
+    ],
+    catch: '「面白いと思ったら止まれない」—— 爆発的な集中力を使いこなすタイプ',
+    desc: 'あなたは「見て理解する×知的好奇心×直前爆発力」という、誰よりも鮮烈な集中力を持つタイプです。「これ面白い！」と思った瞬間、時間を忘れて没頭できる——そんな経験はありませんか？ 動画や図解を見るだけで内容がスッと入ってくる視覚の力と、好奇心が爆発したときの集中力は、このタイプの最大の武器です。ただし、「面白くないとスイッチが入らない」「締め切りが近くないと動けない」という特性もあります。この特性を認めたうえで、「どうすればスイッチを入れられるか」の工夫を積み重ねることが成績アップへの近道です。',
+    strengths: [
+      { text: '興味が湧いた瞬間の集中力と情報吸収速度は8タイプ中でもトップクラス。動画・図解・漫画参考書など「ビジュアルで見る」形式との相性が抜群。', icon: '⚡' },
+      { text: '「なぜそうなるの？」という好奇心が深い理解につながる。興味を持った分野は教科書外の知識まで自然に吸収できる。', icon: '🔍' },
+      { text: '直前の短時間集中で成果を出す「要領のよさ」がある。ポイントを素早く把握して、最低限必要なことを効率的に処理できる。', icon: '🎯' },
+    ],
+    ng: [
+      { label: '「面白くない」教科は後回しにしすぎる', body: '得意・興味のある教科は伸びるが、苦手教科が積み重なって定期テストで足を引っ張るパターンに注意。「全教科の最低ライン」を決めておこう。' },
+      { label: '直前にやろうとしたら試験範囲が多すぎて焦る', body: '直前集中は強力だが、範囲が広い定期テストや実力テストでは対応しきれないことも。「仕込み期間」を作ることが唯一の解決策。' },
+      { label: '「見ただけでわかった気になる」落とし穴', body: '動画を見たり図解を眺めたりして「わかった！」と感じても、実際に問題を解くと書けないことがある。インプット後に必ず手を動かすアウトプットを。' },
+    ],
+    tips: [
+      { title: '動画・図解を「入口」にする超速インプット法', body: '新しい単元は教科書を開く前に、まずYouTubeの解説動画を5〜10分見てみよう。全体のイメージができてから教科書を読むと、内容の理解スピードが大きく変わる。映像で「あ、こういうことか！」という感覚をつかんでから細かい内容に入るのが、視覚×好奇心タイプの最強学習法。' },
+      { title: '「25分集中→5分休憩」のポモドーロ法', body: 'スマホのタイマーを25分にセットして「この25分だけ集中する」と決めよう。25分なら「ちょっとくらいできる」と思えるハードルの低さがポイント。終わったら5分休憩してリセット。このサイクルを繰り返すだけで、合計の集中時間が驚くほど増える。「やる気が出てから始める」より「始めれば出てくる」方が多い。' },
+      { title: '「面白い入口」を全教科に作る', body: '苦手な教科でも「面白い入口」を一つ見つけると、そこからモチベーションが生まれる。例えば「数学の図形問題→建築デザインとの関係」「歴史→好きなゲームの世界観の元ネタ」など。まず興味が持てる角度を探してから取り組むと、苦手意識が薄れやすい。' },
+      { title: '「テスト2週間前カレンダー」に1日1行書く', body: 'テスト2週間前になったらカレンダーを取り出し、毎日やることを1行だけ書いておこう（例：月曜＝数学p.40〜45）。多く書きすぎず、「1日1行」がポイント。続けているうちに「仕込み」が積まれて、直前に楽になる。完璧な計画より、続けられる軽さが大事。' },
+      { title: '「見た後に必ず手を動かす」の鉄則を守る', body: '動画を見た・図解を読んだ・授業を聞いた——このインプットをした後、必ず「何も見ずに紙に書いて再現する」時間を5分でも作ろう。書けた部分は理解できている。書けなかった部分が本当の弱点。インプット直後のアウトプットは記憶の定着率を大きく高める。' },
+    ],
+    subjects: [
+      { emoji: '📐', name: '数学', tag: 'おすすめ：解法動画→即演習', advice: '解き方がわからない問題は動画解説を見てからすぐ似た問題を解こう。「なぜこの式になるか」の図解を自分で描いてみることも理解の助けになる。計算は正確さより「パターン認識」から先に鍛えると得意になりやすい。' },
+      { emoji: '✏️', name: '国語', tag: 'おすすめ：映像→文章の変換練習', advice: '物語文は「登場人物の感情の変化」を図やイラストで描くと読み取りが楽になる。説明文は「筆者の主張→理由→具体例」の構造を図式化する癖をつけよう。語彙力は映像コンテンツの字幕から増やすのも一つの方法。' },
+      { emoji: '🌍', name: '英語', tag: 'おすすめ：音声・動画からのインプット', advice: '英語は耳から入ると定着が早い。好きな洋楽や英語版アニメを流しながら、気になった表現をメモしてみよう。文法は例文を「映像として思い浮かべながら」読むと記憶に残りやすい。単語帳は絵付きのものを選ぶと効果的。' },
+    ],
+  },
+
+  // =========================================================
+  // BAA : コツコツ職人（書く×目標×計画）
+  // =========================================================
+  'BAA': {
+    name: 'コツコツ職人',
+    en: 'STEADY CRAFTSMAN',
+    icon: '📖',
+    tags: [
+      { label: '運動感覚優位', color: '#EEEDFE', textColor: '#3C3489' },
+      { label: '目標型', color: '#E1F5EE', textColor: '#085041' },
+      { label: 'コツコツ計画型', color: '#FAEEDA', textColor: '#633806' },
+    ],
+    catch: '「手を動かし続けた分だけ、確実に力がつく」—— 最も安定した成績向上が期待できるタイプ',
+    desc: 'あなたは「書いて覚える×目標達成×計画的に積み上げる」という、最も地に足のついた学習ができるタイプです。繰り返し書いて練習することで知識を確実に定着させ、計画を立てて毎日コツコツと積み上げる力があります。地味に見えるかもしれませんが、このタイプは長期的に見ると最も安定した成績向上を実現できます。「一発逆転」ではなく「着実な積み上げ」が得意であることを、自信を持って誇りにしてください。努力が裏切らないのが、このタイプの最大の強みです。',
+    strengths: [
+      { text: '繰り返し書いて練習することで、曖昧な知識をしっかりとした記憶に変えられる。漢字・単語・公式・解法など、書いて覚えることがとにかく定着しやすい。', icon: '✍' },
+      { text: '「今日はここまで」という計画を立てたら、誘惑に負けずに実行できる自己管理力がある。毎日のルーティンを守り続けることが得意。', icon: '📅' },
+      { text: '「目標点数」や「合格校」が決まると、そこへ向かって迷わず努力を続けられる。遠いゴールでも諦めずに毎日の積み重ねで近づける。', icon: '🎯' },
+    ],
+    ng: [
+      { label: '「書くこと」自体に時間をかけすぎる', body: 'きれいなノートを作ることに夢中になりすぎると、問題を解く時間が不足する。ノートは「見やすさ6割・スピード4割」を目安に、書く量を適切にコントロールしよう。' },
+      { label: '同じ問題を繰り返して「解いた気になる」', body: '一度解いた問題を繰り返すのは良いが、「これは前にやったからわかる」と目で確認するだけになっている場合は要注意。必ず手を動かして実際に解こう。' },
+      { label: '完璧主義で「ここがわからないと進めない」と止まる', body: 'わからない部分が出ると先に進めなくなるパターンに注意。わからなければ先生に聞くか、「あとで戻る印をつけて先に進む」を徹底しよう。' },
+    ],
+    tips: [
+      { title: '「3回書き」反復練習法でゼロから習得する', body: '覚えたいことを3段階で書こう。①教科書を見ながら書く（理解）→②教科書を閉じて書く（再現）→③次の日に何も見ずに書けるか確認する（定着確認）。この3段階を踏むだけで、1回書いて終わりにするより記憶の定着率が3倍以上になると言われている。特に漢字・英単語・数学の公式に絶大な効果がある。' },
+      { title: '毎日の「勉強ルーティン」を曜日ごとに固定する', body: '「月水金は数学30分→英語20分、火木土は国語20分→理科・社会30分」のように、曜日ごとにやることを決めてしまおう。決まっていれば「今日は何をしようか」と考える無駄な時間がなくなる。始めるハードルが消えると、自然に机に向かえるようになる。' },
+      { title: '「間違いノート」を作って定期的に解き直す', body: '問題演習で間違えた問題だけを1冊のノートにまとめよう。問題・間違えた理由・正しい解き方の3点を書いておく。テスト1週間前にはこのノートだけを繰り返し解き直せば、苦手を効率よく潰せる。「間違えた問題は一度解き直して正解できたら卒業」のシステムを作ろう。' },
+      { title: '「書いて、隠して、思い出す」エビングハウス活用法', body: '記憶の研究では「一定間隔で思い出す練習をした知識は忘れにくくなる」ことが知られている。学んだ日に書いた内容を、翌日・3日後・1週間後に「隠して書き直せるか確認する」だけで記憶の定着率が飛躍的に上がる。手帳に「復習日」を書き込んでおくと忘れない。' },
+      { title: '「目標から逆算した週間計画」を日曜日に作る', body: '毎週日曜日に、今週の目標（例：数学の一次方程式を完璧にする）を決めて、月〜土の6日間に振り分けよう。1日あたりのページ数や問題数を計算してから書くと、「今日どれだけやればいいか」が一目でわかる。このタイプには「計画が見えている状態」が最も力を発揮できる。' },
+    ],
+    subjects: [
+      { emoji: '📐', name: '数学', tag: 'おすすめ：解法の「型」を書いて体得', advice: '解き方のパターンを手順通りに何度も書いて練習しよう。最初は例題を写すだけでも良い。次第に「このタイプはこう解く」という型が体に染みつく。計算練習は毎日少しずつ行い、正確さを最優先に。スピードは正確さが身についた後から自然についてくる。' },
+      { emoji: '✏️', name: '国語', tag: 'おすすめ：書き抜き法で読解力を鍛える', advice: '長文を読みながら重要な箇所に線を引き、その文をノートに書き抜く練習をしよう。書き抜くことで「どこが重要か」を判断する力が鍛えられる。漢字は書いて覚えることが最も得意なはず。1日5個を3回ずつ書く習慣をつけよう。' },
+      { emoji: '🌍', name: '英語', tag: 'おすすめ：書いて覚える単語・文法', advice: '英単語は発音しながら書くと記憶の定着率が高まる。例文ごと書いて覚えると、単語の使い方も同時に身につく。文法はルールをノートに書いて整理してから例文を5〜10個書こう。書く量が多いほど定着するのがこのタイプの強み。' },
+    ],
+  },
+
+  // =========================================================
+  // BAB : 追い込みエース（書く×目標×直前）
+  // =========================================================
+  'BAB': {
+    name: '追い込みエース',
+    en: 'CLUTCH PLAYER',
+    icon: '🔥',
+    tags: [
+      { label: '運動感覚優位', color: '#EEEDFE', textColor: '#3C3489' },
+      { label: '目標型', color: '#E1F5EE', textColor: '#085041' },
+      { label: '直前集中型', color: '#FAECE7', textColor: '#712B13' },
+    ],
+    catch: '「テスト前夜の集中力は誰にも負けない」—— 追い込みで書いて詰め込む底力タイプ',
+    desc: 'あなたは「書いて覚える×目標達成×直前に底力が出る」という、逆境に強いタイプです。テスト前夜、焦りと集中が混ざり合った状態で猛烈に書いて覚え、そのままテストに臨む——このやり方で結果を出した経験があるのではないでしょうか？ 「書いて覚える力」と「直前の追い込み力」が組み合わさると、短時間でも驚くほどの量を記憶できます。ただし、この力を前日だけに頼ると「前日から体調が悪い」「範囲が広すぎる」など予想外の事態に対応できません。書くスピードと追い込み力を維持しながら、少しずつ仕込みを早める工夫が、成績を安定させる最大のポイントです。',
+    strengths: [
+      { text: '短期間で一気に書いて覚える力が強い。テスト前の限られた時間でも、書くことで情報を大量に記憶に叩き込める。', icon: '✍' },
+      { text: 'ゴールが見えると迷いなく動き出せる行動力がある。「この点数を取る」「この高校に合格する」という具体的な目標を掲げると、それだけで集中力が跳ね上がる。', icon: '🎯' },
+      { text: '追い込まれたときの集中力・胆力が高い。困難な状況でも諦めずに最後まで食らいつく粘り強さがある。', icon: '💪' },
+    ],
+    ng: [
+      { label: '前日だけに頼る「一夜漬け」を習慣化してしまう', body: '短期記憶には入っても、2週間後の実力テストや高校入試では残っていない。「直前力」は保ちながら、少しずつ「前倒しの仕込み」を増やしていこう。' },
+      { label: '書くことに集中しすぎて「内容の理解」が追いつかない', body: '机に向かって一生懸命書いているのに点数が上がらない場合、「写しているだけ」になっている可能性がある。書きながら「意味を考える」を意識しよう。' },
+      { label: 'ゴールが遠すぎると動き出せない', body: '「3か月後のテストのために今日勉強する」というのがこのタイプには難しい。近い締め切りを自分で作ることが最大の対策。' },
+    ],
+    tips: [
+      { title: '「前日最強ノート」を毎日1ページ仕込む', body: 'テスト前日に使う専用ノートを今日から作り始めよう。授業が終わったら「今日の内容で絶対覚えるべきことだけ」を1ページ（多くて10行）にまとめる。書いて整理することで理解も深まり、前日にそのノートを見るだけで一気に復習できる仕組みが完成する。積み重ねるほど前日の武器が強くなる。' },
+      { title: '「3日前から書いて覚える」スプリント期間を作る', body: 'テスト当日から逆算して「ラスト3日間」を「本気の書き込み期間」と決めよう。1日目：全範囲を書き出して確認。2日目：苦手分野を何度も書いて記憶に刻む。3日目：最重要事項だけを最終確認。この3日間の書き込み量が直前力を最大限に発揮させる。' },
+      { title: '「目標点数→書くべきことリスト」を作る', body: 'テスト前にまず「取りたい点数のために何を覚えるか」を書き出してリスト化しよう。例えば「英語70点→単語50個＋文法3項目＋教科書本文2つ」と決まれば、あとはそれを書いて覚えるだけ。目標が数字で見えると、このタイプは最速で動き出せる。' },
+      { title: '「書いてすぐ隠す」即席暗記法を繰り返す', body: '暗記したいことを書いたら、すぐに紙で隠して「何を書いたか言えるか？」を確認しよう。言えたらOK、言えなければもう一度書く。このサイクルを素早く繰り返すことで、短時間に多くの知識を詰め込める。テスト直前にこれを続けると、記憶の「呼び出し訓練」ができて本番での再現性が上がる。' },
+      { title: '週1回「小さな締め切り」を自分に課す', body: '毎週金曜日を「今週の範囲の小テスト日」と決めて、問題を5問だけ自分で作って解こう。5問だけなら負担にならないし、「週1回の締め切り」があるだけで、今週勉強したことを見直す習慣が生まれる。このサイクルが身につくと、テスト前日の負担が劇的に減る。' },
+    ],
+    subjects: [
+      { emoji: '📐', name: '数学', tag: 'おすすめ：解法パターンの「体に覚え込ませる」練習', advice: '解き方を声に出しながら手を動かして書こう。「この問題はこう解く」というパターンを体に染み込ませることで、テスト本番で「あ、これは〇〇のパターンだ」と即座に判断できるようになる。間違えた問題は必ずその場で書き直して「正解の手順」を体で覚えよう。' },
+      { emoji: '✏️', name: '国語', tag: 'おすすめ：書いて「型」を身につける', advice: '記述問題は「答え方の型」を書いて体に覚え込ませよう。「〇〇だから、〇〇ということ。」という書き方のパターンを何度も練習すると、本番で迷わなくなる。漢字は1字5回書きを習慣にしよう。書いた分だけ確実に得点力になる。' },
+      { emoji: '🌍', name: '英語', tag: 'おすすめ：例文の丸ごと書き取り', advice: '英文法のルールを覚えるより「お手本例文を丸ごと書き写して暗記する」方法が効果的。例文を覚えると単語・文法・語順が同時に身につく。テスト前日には覚えた例文を見ずに書けるか確認しよう。書ける分だけ得点に直結する。' },
+    ],
+  },
+
+  // =========================================================
+  // BBA : プランナー（書く×興味×計画）
+  // =========================================================
+  'BBA': {
+    name: 'プランナー',
+    en: 'STRATEGIC PLANNER',
+    icon: '📋',
+    tags: [
+      { label: '運動感覚優位', color: '#EEEDFE', textColor: '#3C3489' },
+      { label: '興味・好奇心型', color: '#E1F5EE', textColor: '#085041' },
+      { label: 'コツコツ計画型', color: '#FAEEDA', textColor: '#633806' },
+    ],
+    catch: '「書いて整理すると、頭の中がクリアになる」—— 理解の深さで勝負するタイプ',
+    desc: 'あなたは「書いて覚える×知的好奇心×計画的に積み上げる」という、自分だけの世界観で学びを深めるタイプです。ただ教科書を読むだけでは物足りず、書いて整理して自分なりに理解したいと感じるのではないでしょうか？ 計画表を作ること自体が好きで、「今週はこれを完璧にする」と決めてじっくり進める力があります。書いてまとめる過程そのものが楽しく、知識が自分のものになっていく感覚を大切にします。表面的な暗記よりも「わかること」を優先するこのタイプは、理解の深さが成績の土台になります。',
+    strengths: [
+      { text: '情報を書き出して整理・分類する力が高い。教科書の内容を自分の言葉で書き直すことで、深い理解が生まれる。「なぜそうなるか」まで書いて初めて満足できる。', icon: '✍' },
+      { text: '好きな分野・興味があることについては独学でも深く掘り下げられる。参考書だけでなく図書館や資料集まで使って調べる探究心がある。', icon: '🔍' },
+      { text: '計画表・チェックリスト・やることリストを活用して安定的に学習できる。計画を立てること自体にモチベーションがあり、遂行力も高い。', icon: '📅' },
+    ],
+    ng: [
+      { label: '「まとめノートを作る」に時間をかけすぎる', body: '理解が深まるまとめは素晴らしいが、ノート作りに時間をかけすぎると問題演習が減る。「まとめ30分→演習30分」のバランスを崩さないようにしよう。' },
+      { label: '計画が崩れると一気にやる気をなくす', body: '完璧な計画を立てていると、1日ズレただけでやる気がダウンする場合がある。計画は「崩れるもの」と割り切り、週単位で調整するゆとりを持とう。' },
+      { label: '興味のない教科の計画が形骸化する', body: '好きな教科は計画通り進むが、興味のない教科の分だけ後回しになりがち。苦手教科こそ「最初に小さい範囲から達成感を得る」戦略が必要。' },
+    ],
+    tips: [
+      { title: '「自分言葉ノート」で教科書を完全に書き換える', body: '教科書を読んだ後、それを全部閉じて「自分の言葉だけで説明を書く」練習をしよう。書けない部分が本当の弱点。書けた部分は完全に理解できている証拠。これを繰り返すことで「わかったつもり」から「本当にわかった」状態になれる。このノートは最強のオリジナル参考書になる。' },
+      { title: '計画表に「なぜやるか」を1行添える', body: '毎週の計画表に項目だけでなく「これをやると〇〇が得意になる」という理由を一行書き添えよう。例えば「方程式の文章題→高校でも使う基礎だから」。理由がわかると「なぜ今これをやるのか」が明確になり、興味とモチベーションが維持しやすくなる。' },
+      { title: '「書いて教える」アウトプット最強法', body: '学んだことを「友達に教えるつもりで紙に書いて説明する」練習をしよう。何も見ずに説明できる＝完全に理解できている、ということ。書けなかった部分は即座に教科書で確認。この「書いて説明できるか」テストは、一番正直な自己チェックになる。' },
+      { title: '「好きな教科→関連する苦手教科」の橋を架ける', body: '得意・好きな教科から苦手教科への接点を意識的に作ろう。例えば「歴史が好き→地理で地形が文明に与えた影響を調べる」「国語が得意→理科の説明文を読むことに応用する」など。好きなところから苦手な分野へ橋を渡すことで、苦手への抵抗感が自然に薄れていく。' },
+      { title: '週に一度「書き直し確認テスト」を自分に課す', body: '毎週末に今週学んだことを「何も見ずに紙に書いて再現できるか」確認しよう。問題を解くのではなく、単元の内容を白紙のノートに説明できるか書くだけでいい。書けた部分は定着している証拠。書けなかった部分だけ翌週の最優先で復習する。' },
+    ],
+    subjects: [
+      { emoji: '📐', name: '数学', tag: 'おすすめ：「なぜ」を書いて解法を理解する', advice: '公式を覚える前に「なぜこの公式が成り立つのか」をノートに書いて証明してみよう。理解して覚えた公式は忘れにくく、応用もできる。問題を解いた後は「なぜこのやり方で解けるのか」を書いて説明できるかチェックしよう。' },
+      { emoji: '✏️', name: '国語', tag: 'おすすめ：筆者の意図を書き出す', advice: '説明文・論説文は「筆者が最も言いたいことは何か」を自分の言葉でノートに書いてみよう。本文と照らし合わせて修正する作業が読解力を鍛える。感想文・作文は「書きたいことを箇条書き→構成を決める→書く」の手順を踏むと書きやすい。' },
+      { emoji: '🌍', name: '英語', tag: 'おすすめ：文法を「自分ルールブック」にまとめる', advice: '英文法を習うたびに「自分だけのルールブック」に書いていこう。ルール・例外・自分が間違えやすいパターンを書き足す。このノートが積み重なるほど、英語の「自分地図」が完成していく。読解は構造を書いて分析すると速く正確に読めるようになる。' },
+    ],
+  },
+
+  // =========================================================
+  // BBB : インスピレーター（書く×興味×直前）
+  // =========================================================
+  'BBB': {
+    name: 'インスピレーター',
+    en: 'INSPIRATOR',
+    icon: '🎨',
+    tags: [
+      { label: '運動感覚優位', color: '#EEEDFE', textColor: '#3C3489' },
+      { label: '興味・好奇心型', color: '#E1F5EE', textColor: '#085041' },
+      { label: '直前集中型', color: '#FAECE7', textColor: '#712B13' },
+    ],
+    catch: '「やる気が来たら誰にも止められない」—— 爆発的な創造力と集中力を持つタイプ',
+    desc: 'あなたは「書いて覚える×知的好奇心×やる気の爆発力」という、最もユニークな学習スタイルを持つタイプです。興味が爆発した瞬間、夢中になって書きまくり、頭の中が整理されていく感覚——そんな体験をしたことはありませんか？ このタイプの「やる気スイッチが入ったときの集中力」と「書いて考える創造力」は、他のタイプにはない特別な強みです。ただし、スイッチが入らない日は本当に動けないことがあります。「やる気が来るのを待つ」のではなく、「スイッチの入れ方」を自分でデザインすることが、このタイプの成長の核心です。',
+    strengths: [
+      { text: 'やる気スイッチが入ったときの集中力・吸収速度・創造力は8タイプ中でも突出している。書いて考えながら自分なりの理解を作り上げることができる。', icon: '🎨' },
+      { text: '好奇心が向いた方向への探究力が深い。一つの疑問から次々と関連することに気づき、気がついたら教科書を大きく超えた理解に達していることがある。', icon: '🔍' },
+      { text: '書いて整理することで「自分だけの視点」が生まれ、記述問題や作文で個性的かつ説得力のある答えを出せる力がある。', icon: '✍' },
+    ],
+    ng: [
+      { label: '「やる気が出ない日は何もしない」になりやすい', body: 'やる気がないときに無理をする必要はないが、「とりあえず1問だけ解く」「教科書を1分だけ開く」という極小の行動から始めると、意外とスイッチが入る。「やる気が先、行動が後」ではなく「行動が先、やる気が後」を意識しよう。' },
+      { label: '得意分野と苦手分野の差が広がりやすい', body: '好きなことは深掘りするが、興味の持てない教科はほぼ手をつけない——このアンバランスがテストで足を引っ張る。苦手科目に「面白い入口」を一つ見つけることが最初のステップ。' },
+      { label: '書きながら「脱線」して時間が過ぎる', body: 'ノートをまとめているうちに関係ない絵を描いたり、別のことを調べ始めたりして時間が経つことがある。タイマーで時間を区切ると集中が維持しやすい。' },
+    ],
+    tips: [
+      { title: '「やる気スイッチ儀式」を自分でデザインする', body: '勉強を始める前に毎回やる「小さな儀式」を決めよう。例えば「好きな曲を1曲だけ聴く」「お気に入りのペンを出してノートを開く」「10秒間深呼吸する」など何でもいい。この儀式をやるたびに「集中モード」に入れるよう、繰り返しで条件反射を作ることがポイント。儀式は自分だけの「スイッチ」になる。' },
+      { title: '「今日はここだけ」の超ピンポイント集中法', body: '「今日の宿題をやる」より「今日は数学の教科書38ページだけやる」のほうが動き出しやすい。やることを極限まで絞ることが、このタイプには最も効く。終わったら次の1ページをやってもいいし、そこで終わってもいい。「ちょっとだけ」の積み重ねがこのタイプには最強の戦略。' },
+      { title: '「書きながら考える」思考書き出し法', body: 'わからない問題にぶつかったとき、手を止めるのではなく「わからない」「ここまではわかる」「こういうことかも」を書き出してみよう。書いているうちにアイデアが浮かんでくる——これがこのタイプの最大の強み。白紙のノートに「考えていること」をすべて書き殴ることで、思考が整理されていく。' },
+      { title: '「好き」な内容で技術を磨き「苦手」に応用する', body: '好きな教科で身につけた技術を意識的に苦手教科に転用しよう。例えば「文章をまとめるのが好き」なら、数学の解説を書いてみる。「絵を描くのが好き」なら、理科の現象をイラストで描いてみる。「好き」から入ることで脳が活性化し、苦手へのアプローチが楽になる。' },
+      { title: 'タイマーで「時間の枠」を作る', body: 'スマホのタイマーを25分にセットして「この枠の中だけ集中する」と決めよう。終わったら5分自由時間。この「有限の枠」があるだけで、集中力が驚くほど発揮しやすくなる。「無限に勉強しなければいけない」という感覚が一番モチベーションを削ぐ。25分×4セットで、合計100分の学習量を確保できる。' },
+    ],
+    subjects: [
+      { emoji: '📐', name: '数学', tag: 'おすすめ：「なぜ」の疑問を起点にする', advice: '「なぜこの公式はこう書くの？」という疑問を書き出してから理解を深めると、納得感が生まれて記憶に残りやすい。図形や関数など「視覚的に描ける」分野が特に取り組みやすい。計算練習は音楽を聴きながら手を動かすリズム学習も◎。' },
+      { emoji: '✏️', name: '国語', tag: 'おすすめ：「感じたこと」から読解へ', advice: '文章を読んで感じたことをまず書いてから、作者の意図を考えると読解が深まる。作文・感想文はこのタイプの最大の得意分野。自由に書いてから「わかりやすく整理する」順番で仕上げよう。漢字は書いたり意味を絵で描いたりする工夫で記憶が定着しやすい。' },
+      { emoji: '🌍', name: '英語', tag: 'おすすめ：英語で「自分の思い」を書く', advice: '英語日記・英語のメモなど、実際に英語で何か書く練習が語彙力と表現力を同時に鍛える。「うまく書けなくていい、書くことが大事」という気持ちで始めよう。興味のある洋楽の歌詞を書き写すのも語感を養う良い方法。' },
+    ],
+  },
+
+};
+
+// ===================================================
+// STATE
+// ===================================================
+let currentQ = 0;
+let answers = new Array(12).fill(null); // null | 'A' | 'B'
+
+// ===================================================
+// SCREEN CONTROL
+// ===================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+  });
+  const el = document.getElementById(id);
+  el.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===================================================
+// QUIZ LOGIC
+// ===================================================
+function startQuiz() {
+  currentQ = 0;
+  answers = new Array(12).fill(null);
+  showScreen('screen-quiz');
+  renderQuestion();
+}
+
+function retryQuiz() {
+  startQuiz();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  const progress = ((currentQ) / QUESTIONS.length) * 100;
+
+  document.getElementById('quiz-category').textContent = q.category;
+  document.getElementById('progress-fill').style.width = progress + '%';
+  document.getElementById('progress-text').textContent = (currentQ + 1) + ' / ' + QUESTIONS.length;
+  document.getElementById('q-number').textContent = 'Question ' + (currentQ + 1);
+  document.getElementById('q-text').textContent = q.text;
+
+  const grid = document.getElementById('answer-grid');
+  grid.innerHTML = '';
+
+  const opts = [
+    { val: 'A', label: 'そう思う', sub: 'あてはまる・自分に近い' },
+    { val: 'B', label: 'そう思わない', sub: 'あてはまらない・自分と違う' },
+  ];
+
+  opts.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn' + (answers[currentQ] === opt.val ? ' selected' : '');
+    btn.innerHTML = `
+      <div class="answer-bullet">${opt.val}</div>
+      <div>
+        <div class="answer-label">${opt.label}</div>
+        <div class="answer-sub">${opt.sub}</div>
+      </div>
+    `;
+    btn.onclick = () => selectAnswer(opt.val);
+    grid.appendChild(btn);
+  });
+
+  updateNav();
+}
+
+function selectAnswer(val) {
+  answers[currentQ] = val;
+  document.querySelectorAll('.answer-btn').forEach(btn => {
+    btn.classList.remove('selected');
+    if (btn.querySelector('.answer-bullet').textContent === val) {
+      btn.classList.add('selected');
+    }
+  });
+  updateNav();
+
+  // Auto advance after short delay
+  setTimeout(() => {
+    if (currentQ < QUESTIONS.length - 1) {
+      goNext();
+    } else {
+      goNext();
+    }
+  }, 380);
+}
+
+function updateNav() {
+  document.getElementById('btn-back').disabled = (currentQ === 0);
+  document.getElementById('btn-next').disabled = (answers[currentQ] === null);
+  if (currentQ === QUESTIONS.length - 1 && answers[currentQ] !== null) {
+    document.getElementById('btn-next').textContent = '診断する →';
+  } else {
+    document.getElementById('btn-next').textContent = '次の問題へ →';
+  }
+}
+
+function goNext() {
+  if (answers[currentQ] === null) return;
+  if (currentQ < QUESTIONS.length - 1) {
+    currentQ++;
+    renderQuestion();
+  } else {
+    showLoading();
+  }
+}
+
+function goBack() {
+  if (currentQ > 0) {
+    currentQ--;
+    renderQuestion();
+  }
+}
+
+// ===================================================
+// LOADING → RESULT
+// ===================================================
+function showLoading() {
+  showScreen('screen-loading');
+  setTimeout(showResult, 1800);
+}
+
+function calcResult() {
+  // Axis 1: visual(A) vs kinesthetic(B)
+  // Q0(axis1,A), Q1(axis1,B), Q2(axis1,A), Q3(axis1,B)
+  let vis = 0, kin = 0;
+  // Q0: A=visual
+  if (answers[0] === 'A') vis++;
+  if (answers[0] === 'B') kin++;
+  // Q1: A=kinesthetic
+  if (answers[1] === 'A') kin++;
+  if (answers[1] === 'B') vis++;
+  // Q2: A=visual
+  if (answers[2] === 'A') vis++;
+  if (answers[2] === 'B') kin++;
+  // Q3: A=kinesthetic
+  if (answers[3] === 'A') kin++;
+  if (answers[3] === 'B') vis++;
+
+  // Axis 2: goal(A) vs interest(B)
+  // Q4(axis2,A), Q5(axis2,B), Q6(axis2,A), Q7(axis2,B)
+  let goal = 0, intr = 0;
+  if (answers[4] === 'A') goal++;
+  if (answers[4] === 'B') intr++;
+  if (answers[5] === 'A') intr++;
+  if (answers[5] === 'B') goal++;
+  if (answers[6] === 'A') goal++;
+  if (answers[6] === 'B') intr++;
+  if (answers[7] === 'A') intr++;
+  if (answers[7] === 'B') goal++;
+
+  // Axis 3: planner(A) vs sprinter(B)
+  // Q8(axis3,A), Q9(axis3,B), Q10(axis3,A), Q11(axis3,B)
+  let plan = 0, sprt = 0;
+  if (answers[8] === 'A') plan++;
+  if (answers[8] === 'B') sprt++;
+  if (answers[9] === 'A') sprt++;
+  if (answers[9] === 'B') plan++;
+  if (answers[10] === 'A') plan++;
+  if (answers[10] === 'B') sprt++;
+  if (answers[11] === 'A') sprt++;
+  if (answers[11] === 'B') plan++;
+
+  const a1 = vis >= kin ? 'A' : 'B';
+  const a2 = goal >= intr ? 'A' : 'B';
+  const a3 = plan >= sprt ? 'A' : 'B';
+
+  return {
+    key: a1 + a2 + a3,
+    vis, kin, goal, intr, plan, sprt
+  };
+}
+
+function showResult() {
+  const r = calcResult();
+  const type = TYPES[r.key];
+
+  // Icon & name & en
+  document.getElementById('result-icon').textContent = type.icon;
+  document.getElementById('result-name').textContent = type.name;
+  document.getElementById('result-en').textContent = type.en;
+
+  // Tags
+  const tagsEl = document.getElementById('result-tags');
+  tagsEl.innerHTML = '';
+  type.tags.forEach(t => {
+    const span = document.createElement('span');
+    span.className = 'result-tag';
+    span.style.background = t.color;
+    span.style.color = t.textColor;
+    span.style.borderColor = t.color;
+    span.textContent = t.label;
+    tagsEl.appendChild(span);
+  });
+
+  // Axis bars
+  const total1 = r.vis + r.kin || 1;
+  const total2 = r.goal + r.intr || 1;
+  const total3 = r.plan + r.sprt || 1;
+  const pct1 = Math.round((r.vis / total1) * 100);
+  const pct2 = Math.round((r.goal / total2) * 100);
+  const pct3 = Math.round((r.plan / total3) * 100);
+
+  document.getElementById('bar-axis1').style.width = pct1 + '%';
+  document.getElementById('bar-axis2').style.width = pct2 + '%';
+  document.getElementById('bar-axis3').style.width = pct3 + '%';
+
+  document.getElementById('bar-axis1-label').textContent =
+    pct1 >= 60 ? '視覚優位寄り（' + pct1 + '%）' :
+    pct1 <= 40 ? '運動感覚優位寄り（' + (100 - pct1) + '%）' :
+    'ほぼ均等（どちらも活用できる）';
+  document.getElementById('bar-axis2-label').textContent =
+    pct2 >= 60 ? '目標型寄り（' + pct2 + '%）' :
+    pct2 <= 40 ? '興味型寄り（' + (100 - pct2) + '%）' :
+    'ほぼ均等（バランス型）';
+  document.getElementById('bar-axis3-label').textContent =
+    pct3 >= 60 ? '計画型寄り（' + pct3 + '%）' :
+    pct3 <= 40 ? '直前集中型寄り（' + (100 - pct3) + '%）' :
+    'ほぼ均等（状況対応型）';
+
+  // Catch & Description
+  document.getElementById('result-catch').textContent = type.catch;
+  document.getElementById('result-desc').textContent = type.desc;
+
+  // Strengths
+  const ul = document.getElementById('result-strengths');
+  ul.innerHTML = '';
+  type.strengths.forEach(s => {
+    const li = document.createElement('li');
+    li.innerHTML = '<div class="strength-dot">' + (s.icon || '✓') + '</div><span>' + s.text + '</span>';
+    ul.appendChild(li);
+  });
+
+  // NG actions
+  const ngEl = document.getElementById('result-ng');
+  ngEl.innerHTML = '';
+  type.ng.forEach(n => {
+    const div = document.createElement('div');
+    div.className = 'ng-item';
+    div.innerHTML = '<div class="ng-x">×</div><div class="ng-content"><div class="ng-label">' + n.label + '</div><div class="ng-body">' + n.body + '</div></div>';
+    ngEl.appendChild(div);
+  });
+
+  // Tips (5)
+  const tipsEl = document.getElementById('result-tips');
+  tipsEl.innerHTML = '';
+  type.tips.forEach((t, i) => {
+    const div = document.createElement('div');
+    div.className = 'tip-item';
+    div.innerHTML = '<div class="tip-num">' + (i + 1) + '</div><div class="tip-content"><div class="tip-title">' + t.title + '</div><div class="tip-body">' + t.body + '</div></div>';
+    tipsEl.appendChild(div);
+  });
+
+  // Subject advice
+  const subjectsEl = document.getElementById('result-subjects');
+  subjectsEl.innerHTML = '';
+  type.subjects.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'subject-item';
+    div.innerHTML = '<div class="subject-name"><span class="subject-emoji">' + s.emoji + '</span>' + s.name + '</div><div class="subject-tip-tag">' + s.tag + '</div><div class="subject-advice">' + s.advice + '</div>';
+    subjectsEl.appendChild(div);
+  });
+
+  showScreen('screen-result');
+
+  // Animate bars after render
+  setTimeout(() => {
+    document.getElementById('bar-axis1').style.width = pct1 + '%';
+    document.getElementById('bar-axis2').style.width = pct2 + '%';
+    document.getElementById('bar-axis3').style.width = pct3 + '%';
+  }, 100);
+}
+</script>
+</body>
+</html>
